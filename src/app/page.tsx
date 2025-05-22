@@ -9,13 +9,13 @@ export default function Home() {
   const [selectedExtensions, setSelectedExtensions] = useState<Extension[]>([]);
   const [loading, setLoading] = useState(false);
   const [version, setVersion] = useState("latest");
-  const [os, setOs] = useState("win32-x64");
+  const [os, setOs] = useState("win32");
   const [cpu, setCpu] = useState("x64");
 
   const toggleExtension = (ext: Extension) => {
-    setSelectedExtensions(prev => 
-      prev.some(e => e.id === ext.id) 
-        ? prev.filter(e => e.id !== ext.id)
+    setSelectedExtensions((prev) =>
+      prev.some((e) => e.extensionId === ext.extensionId)
+        ? prev.filter((e) => e.extensionId !== ext.extensionId)
         : [...prev, ext]
     );
   };
@@ -24,7 +24,7 @@ export default function Home() {
     setLoading(true);
     try {
       const res = await fetch(`/api/search?query=${query}`);
-      const data = await res.json() as { extensions?: Extension[] };
+      const data = (await res.json()) as { extensions?: Extension[] };
       setExtensions(data.extensions || []);
     } catch (error) {
       console.error("Search失败:", error);
@@ -35,7 +35,7 @@ export default function Home() {
 
   const downloadExtensions = async () => {
     if (!selectedExtensions.length) return;
-    
+    console.log(selectedExtensions);
     try {
       const res = await fetch("/api/download", {
         method: "POST",
@@ -43,10 +43,15 @@ export default function Home() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          extensions: selectedExtensions.map(ext => ext.uuid),
-          version,
+          extensions: selectedExtensions.map((ext) => {
+            return {
+              extensionName: ext.extensionName,
+              publisherName: ext.publisher.publisherName,
+              version: ext.versions[0].version,
+            };
+          }),
           os,
-          cpu
+          cpu,
         }),
       });
       const blob = await res.blob();
@@ -65,7 +70,7 @@ export default function Home() {
     <div className="min-h-screen p-8">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-2xl font-bold mb-6">VSCode插件批量下载</h1>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div>
             <label className="block text-sm font-medium mb-1">搜索插件</label>
@@ -107,9 +112,9 @@ export default function Home() {
               onChange={(e) => setOs(e.target.value)}
               className="w-full border rounded px-3 py-2"
             >
-              <option value="win32-x64">Windows x64</option>
-              <option value="darwin-x64">macOS Intel</option>
-              <option value="linux-x64">Linux x64</option>
+              <option value="win32">Windows</option>
+              <option value="darwin">macOS</option>
+              <option value="linux">Linux</option>
             </select>
           </div>
 
@@ -125,7 +130,6 @@ export default function Home() {
             </select>
           </div>
         </div>
-
         {extensions.length > 0 && (
           <div className="mb-6">
             <div className="flex justify-between items-center mb-2">
@@ -142,17 +146,32 @@ export default function Home() {
             </div>
             <div className="border rounded divide-y">
               {extensions.map((ext) => (
-                <div key={ext.id} className="p-3 flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={selectedExtensions.some(e => e.id === ext.id)}
-                    onChange={() => toggleExtension(ext)}
-                    className="mr-3"
-                  />
-                  <div className="flex-1">
-                    <div className="font-medium">{ext.name}</div>
-                    <div className="text-sm text-gray-500">{ext.publisher}</div>
+                <div
+                  key={ext.extensionId}
+                  className={`p-4 flex items-center justify-between ${
+                    selectedExtensions.some(
+                      (e) => e.extensionId === ext.extensionId
+                    )
+                      ? "bg-blue-100"
+                      : "bg-white"
+                  }`}
+                >
+                  <div>
+                    <h3 className="text-lg font-semibold">{ext.displayName}</h3>
+                    <p className="text-sm text-gray-600">
+                      {ext.shortDescription}
+                    </p>
                   </div>
+                  <label className="inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={selectedExtensions.some(
+                        (e) => e.extensionId === ext.extensionId
+                      )}
+                      onChange={() => toggleExtension(ext)}
+                      className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
+                    />
+                  </label>
                 </div>
               ))}
             </div>
