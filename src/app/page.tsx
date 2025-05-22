@@ -28,7 +28,12 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen p-8">
+    <div className="min-h-screen p-8 relative">
+      {loading && (
+        <div className="loading-overlay">
+          <div className="loading-spinner"></div>
+        </div>
+      )}
       <div className="max-w-4xl mx-auto">
         <h1 className="text-2xl font-bold mb-6">VSCode插件下载</h1>
         <div>
@@ -46,7 +51,7 @@ export default function Home() {
               disabled={loading}
               className="bg-blue-500 text-white px-4 py-2 rounded-r hover:bg-blue-600 disabled:bg-gray-400"
             >
-              {loading ? "搜索中..." : "搜索"}
+              搜索
             </button>
           </div>
         </div>
@@ -120,7 +125,7 @@ export default function Home() {
                 return (
                   <div
                     key={ext.extensionId}
-                    className="p-4 hover:bg-gray-50 transition-colors"
+                    className="p-4 transition-colors"
                   >
                     <div className="flex items-start gap-4">
                       <div className="flex-1">
