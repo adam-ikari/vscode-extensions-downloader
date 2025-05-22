@@ -163,36 +163,67 @@ export default function Home() {
               </button> */}
             </div>
             <div className="border rounded divide-y">
-              {extensions.map((ext) => (
-                <div
-                  key={ext.extensionId}
-                  className={`p-4 flex items-center justify-between`}
-                >
-                  <div>
-                    <h3 className="text-lg font-semibold">{ext.displayName}</h3>
-                    <p className="text-sm text-gray-500">
-                      {ext.versions[0].version}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      {ext.publisher.displayName}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      {ext.shortDescription}
-                    </p>
+              {extensions.map((ext) => {
+                const stats = ext.statistics?.reduce((acc, stat) => {
+                  acc[stat.statisticName] = stat.value;
+                  return acc;
+                }, {} as Record<string, number>) || {};
+
+                const installs = stats.install || 0;
+                const rating = stats.averagerating || 0;
+                const ratingCount = stats.ratingcount || 0;
+                const verified = ext.publisher.flags?.includes("verified") || false;
+                const lastUpdated = ext.lastUpdated ? new Date(ext.lastUpdated).toLocaleDateString() : '未知';
+                const publishedDate = ext.publishedDate ? new Date(ext.publishedDate).toLocaleDateString() : '未知';
+
+                return (
+                  <div
+                    key={ext.extensionId}
+                    className="p-4 hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-lg font-semibold">
+                            {ext.displayName}
+                          </h3>
+                          {verified && (
+                            <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                              已验证
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-500 mb-1">
+                          {ext.publisher.displayName} • v{ext.versions[0].version}
+                        </p>
+                        <p className="text-sm text-gray-600 mb-2">
+                          {ext.shortDescription}
+                        </p>
+                        <div className="flex flex-wrap gap-2 mb-2">
+                          <span className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded">
+                            安装量: {Math.floor(installs / 1000)}k+
+                          </span>
+                          <span className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded">
+                            评分: {rating.toFixed(1)} ({ratingCount})
+                          </span>
+                          <span className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded">
+                            更新: {lastUpdated}
+                          </span>
+                          <span className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded">
+                            发布: {publishedDate}
+                          </span>
+                        </div>
+                      </div>
+                      <a
+                        href={getDownloadUrl(ext, os, cpu)}
+                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm whitespace-nowrap"
+                      >
+                        下载
+                      </a>
+                    </div>
                   </div>
-                  <a href={getDownloadUrl(ext, os, cpu)}>下载</a>
-                  {/* <label className="inline-flex items-center cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={selectedExtensions.some(
-                        (e) => e.extensionId === ext.extensionId
-                      )}
-                      onChange={() => toggleExtension(ext)}
-                      className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
-                    />
-                  </label> */}
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
