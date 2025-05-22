@@ -5,8 +5,8 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'VSCode插件批量下载',
-  description: '批量下载VSCode插件的工具',
+  title: 'VSCode插件下载',
+  description: '下载VSCode插件的工具网站',
 }
 
 export default function RootLayout({
