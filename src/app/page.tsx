@@ -28,13 +28,13 @@ export default function Home() {
     }
   };
 
-  const toggleExtension = (ext: Extension) => {
-    setSelectedExtensions((prev) =>
-      prev.some((e) => e.extensionId === ext.extensionId)
-        ? prev.filter((e) => e.extensionId !== ext.extensionId)
-        : [...prev, ext]
-    );
-  };
+  // const toggleExtension = (ext: Extension) => {
+  //   setSelectedExtensions((prev) =>
+  //     prev.some((e) => e.extensionId === ext.extensionId)
+  //       ? prev.filter((e) => e.extensionId !== ext.extensionId)
+  //       : [...prev, ext]
+  //   );
+  // };
 
   const searchExtensions = async () => {
     setLoading(true);
@@ -49,38 +49,38 @@ export default function Home() {
     }
   };
 
-  const downloadExtensions = async () => {
-    if (!selectedExtensions.length) return;
-    console.log(selectedExtensions);
-    try {
-      const res = await fetch("/api/download", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          extensions: selectedExtensions.map((ext) => {
-            return {
-              extensionName: ext.extensionName,
-              publisherName: ext.publisher.publisherName,
-              version: ext.versions[0].version,
-            };
-          }),
-          os,
-          cpu,
-        }),
-      });
-      const blob = await res.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "vscode-extensions.zip";
-      a.click();
-    } catch (error) {
-      console.error("下载失败:", error);
-      alert("下载失败，请重试");
-    }
-  };
+  // const downloadExtensions = async () => {
+  //   if (!selectedExtensions.length) return;
+  //   console.log(selectedExtensions);
+  //   try {
+  //     const res = await fetch("/api/download", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         extensions: selectedExtensions.map((ext) => {
+  //           return {
+  //             extensionName: ext.extensionName,
+  //             publisherName: ext.publisher.publisherName,
+  //             version: ext.versions[0].version,
+  //           };
+  //         }),
+  //         os,
+  //         cpu,
+  //       }),
+  //     });
+  //     const blob = await res.blob();
+  //     const url = window.URL.createObjectURL(blob);
+  //     const a = document.createElement("a");
+  //     a.href = url;
+  //     a.download = "vscode-extensions.zip";
+  //     a.click();
+  //   } catch (error) {
+  //     console.error("下载失败:", error);
+  //     alert("下载失败，请重试");
+  //   }
+  // };
 
   return (
     <div className="min-h-screen p-8">
