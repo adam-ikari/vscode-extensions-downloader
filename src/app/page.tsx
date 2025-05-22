@@ -12,6 +12,22 @@ export default function Home() {
   const [os, setOs] = useState("win32");
   const [cpu, setCpu] = useState("x64");
 
+  const getDownloadUrl = (ext: Extension, os: string, cpu: string): string => {
+    // 根据操作系统和CPU架构生成下载链接
+
+    const downloadUrl = `https://marketplace.visualstudio.com/_apis/public/gallery/publishers/${ext.publisher.publisherName}/vsextensions/${ext.extensionName}/${ext.versions[0].version}/vspackage`;
+    // 判断是否有操作系统和cpu架构的版本
+    const hasPlatformVersion = ext.versions.some(
+      (version) => version.targetPlatform === `${os}-${cpu}`
+    );
+    // 如果有操作系统和cpu架构的版本，则返回带有targetPlatform参数的下载链接
+    if (hasPlatformVersion) {
+      return `${downloadUrl}?targetPlatform=${os}-${cpu}`;
+    } else {
+      return downloadUrl;
+    }
+  };
+
   const toggleExtension = (ext: Extension) => {
     setSelectedExtensions((prev) =>
       prev.some((e) => e.extensionId === ext.extensionId)
@@ -69,7 +85,7 @@ export default function Home() {
   return (
     <div className="min-h-screen p-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold mb-6">VSCode插件批量下载</h1>
+        <h1 className="text-2xl font-bold mb-6">VSCode插件下载</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div>
@@ -92,7 +108,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div>
+          {/* <div>
             <label className="block text-sm font-medium mb-1">VSCode版本</label>
             <select
               value={version}
@@ -103,7 +119,7 @@ export default function Home() {
               <option value="1.85.0">1.85.0</option>
               <option value="1.84.0">1.84.0</option>
             </select>
-          </div>
+          </div> */}
 
           <div>
             <label className="block text-sm font-medium mb-1">操作系统</label>
@@ -127,6 +143,7 @@ export default function Home() {
             >
               <option value="x64">x64</option>
               <option value="arm64">ARM64</option>
+              <option value="armhf">ARM</option>
             </select>
           </div>
         </div>
@@ -134,15 +151,16 @@ export default function Home() {
           <div className="mb-6">
             <div className="flex justify-between items-center mb-2">
               <h2 className="text-lg font-semibold">
-                搜索结果 (已选择 {selectedExtensions.length} 个)
+                搜索结果
+                {/* 搜索结果 (已选择 {selectedExtensions.length} 个) */}
               </h2>
-              <button
+              {/* <button
                 onClick={downloadExtensions}
                 disabled={!selectedExtensions.length}
                 className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:bg-gray-400"
               >
                 下载选中项
-              </button>
+              </button> */}
             </div>
             <div className="border rounded divide-y">
               {extensions.map((ext) => (
@@ -162,7 +180,8 @@ export default function Home() {
                       {ext.shortDescription}
                     </p>
                   </div>
-                  <label className="inline-flex items-center cursor-pointer">
+                  <a href={getDownloadUrl(ext, os, cpu)}>下载</a>
+                  {/* <label className="inline-flex items-center cursor-pointer">
                     <input
                       type="checkbox"
                       checked={selectedExtensions.some(
@@ -171,7 +190,7 @@ export default function Home() {
                       onChange={() => toggleExtension(ext)}
                       className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500"
                     />
-                  </label>
+                  </label> */}
                 </div>
               ))}
             </div>

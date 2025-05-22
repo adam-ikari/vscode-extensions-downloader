@@ -9,15 +9,16 @@ export interface Extension {
   shortDescription: string;
   versions: {
     version: string;
-    files: {
-      assetType: string;
-      source: string;
-    }[];
+    targetPlatform: string;
   }[];
 }
 
 export interface DownloadRequest {
-  extensions: { extensionName: string; publisherName: string; version: string }[];
+  extensions: {
+    extensionName: string;
+    publisherName: string;
+    version: string;
+  }[];
   os: string;
   cpu: string;
 }

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import axios from 'axios';
 import { DownloadRequest } from "@/types";
 import JSZip from "jszip";
 
@@ -33,9 +34,9 @@ export async function POST(request: Request) {
 
         // while (retryCount < 3) {
         // try {
-        response = await fetch(downloadUrl, {
-          redirect: "manual",
-          // signal: controller.signal,
+        response = await axios.get(downloadUrl, {
+          maxRedirects: 0,
+          responseType: 'arraybuffer',
           headers: {
             Accept: "application/octet-stream",
             "User-Agent":
@@ -68,19 +69,13 @@ export async function POST(request: Request) {
         //   });
         // }
 
-        if (!response.ok) {
-          // const errorDetails = {
-          //   status: response.status,
-          //   statusText: response.statusText,
-          //   url: response.url,
-          //   extension: extensionId,
-          // };
+        if (response.status !== 200) {
           throw new Error(
-            `下载失败 (状态码: ${response.status}): ${response.statusText}\n插件: ${extensionName}\nURL: ${response.url}`
+            `下载失败 (状态码: ${response.status}): ${response.statusText}\n插件: ${extensionName}\nURL: ${response.config.url}`
           );
         }
 
-        const blob = await response.blob();
+        const blob = Buffer.from(response.data, 'binary');
         // clearTimeout(timeout);
 
         // 增强文件验证
