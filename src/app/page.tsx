@@ -7,21 +7,11 @@ import { useDownloadUrl } from "@/hooks/useDownloadUrl";
 export default function Home() {
   const [query, setQuery] = useState("");
   const [extensions, setExtensions] = useState<Extension[]>([]);
-  // const [selectedExtensions, setSelectedExtensions] = useState<Extension[]>([]);
   const [loading, setLoading] = useState(false);
-  // const [version, setVersion] = useState("latest");
   const [os, setOs] = useState("win32");
   const [cpu, setCpu] = useState("x64");
 
   const { getDownloadUrl } = useDownloadUrl();
-
-  // const toggleExtension = (ext: Extension) => {
-  //   setSelectedExtensions((prev) =>
-  //     prev.some((e) => e.extensionId === ext.extensionId)
-  //       ? prev.filter((e) => e.extensionId !== ext.extensionId)
-  //       : [...prev, ext]
-  //   );
-  // };
 
   const searchExtensions = async () => {
     setLoading(true);
@@ -35,39 +25,6 @@ export default function Home() {
       setLoading(false);
     }
   };
-
-  // const downloadExtensions = async () => {
-  //   if (!selectedExtensions.length) return;
-  //   console.log(selectedExtensions);
-  //   try {
-  //     const res = await fetch("/api/download", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({
-  //         extensions: selectedExtensions.map((ext) => {
-  //           return {
-  //             extensionName: ext.extensionName,
-  //             publisherName: ext.publisher.publisherName,
-  //             version: ext.versions[0].version,
-  //           };
-  //         }),
-  //         os,
-  //         cpu,
-  //       }),
-  //     });
-  //     const blob = await res.blob();
-  //     const url = window.URL.createObjectURL(blob);
-  //     const a = document.createElement("a");
-  //     a.href = url;
-  //     a.download = "vscode-extensions.zip";
-  //     a.click();
-  //   } catch (error) {
-  //     console.error("下载失败:", error);
-  //     alert("下载失败，请重试");
-  //   }
-  // };
 
   return (
     <div className="min-h-screen p-8">
@@ -94,20 +51,6 @@ export default function Home() {
               </button>
             </div>
           </div>
-
-          {/* <div>
-            <label className="block text-sm font-medium mb-1">VSCode版本</label>
-            <select
-              value={version}
-              onChange={(e) => setVersion(e.target.value)}
-              className="w-full border rounded px-3 py-2"
-            >
-              <option value="latest">最新版</option>
-              <option value="1.85.0">1.85.0</option>
-              <option value="1.84.0">1.84.0</option>
-            </select>
-          </div> */}
-
           <div>
             <label className="block text-sm font-medium mb-1">操作系统</label>
             <select
@@ -120,7 +63,6 @@ export default function Home() {
               <option value="linux">Linux</option>
             </select>
           </div>
-
           <div>
             <label className="block text-sm font-medium mb-1">CPU架构</label>
             <select
@@ -137,31 +79,27 @@ export default function Home() {
         {extensions.length > 0 && (
           <div className="mb-6">
             <div className="flex justify-between items-center mb-2">
-              <h2 className="text-lg font-semibold">
-                搜索结果
-                {/* 搜索结果 (已选择 {selectedExtensions.length} 个) */}
-              </h2>
-              {/* <button
-                onClick={downloadExtensions}
-                disabled={!selectedExtensions.length}
-                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:bg-gray-400"
-              >
-                下载选中项
-              </button> */}
+              <h2 className="text-lg font-semibold">搜索结果</h2>
             </div>
             <div className="border rounded divide-y">
               {extensions.map((ext) => {
-                const stats = ext.statistics?.reduce((acc, stat) => {
-                  acc[stat.statisticName] = stat.value;
-                  return acc;
-                }, {} as Record<string, number>) || {};
+                const stats =
+                  ext.statistics?.reduce((acc, stat) => {
+                    acc[stat.statisticName] = stat.value;
+                    return acc;
+                  }, {} as Record<string, number>) || {};
 
                 const installs = stats.install || 0;
                 const rating = stats.averagerating || 0;
                 const ratingCount = stats.ratingcount || 0;
-                const verified = ext.publisher.flags?.includes("verified") || false;
-                const lastUpdated = ext.lastUpdated ? new Date(ext.lastUpdated).toLocaleDateString() : '未知';
-                const publishedDate = ext.publishedDate ? new Date(ext.publishedDate).toLocaleDateString() : '未知';
+                const verified =
+                  ext.publisher.flags?.includes("verified") || false;
+                const lastUpdated = ext.lastUpdated
+                  ? new Date(ext.lastUpdated).toLocaleDateString()
+                  : "未知";
+                const publishedDate = ext.publishedDate
+                  ? new Date(ext.publishedDate).toLocaleDateString()
+                  : "未知";
 
                 return (
                   <div
@@ -181,7 +119,8 @@ export default function Home() {
                           )}
                         </div>
                         <p className="text-sm text-gray-500 mb-1">
-                          {ext.publisher.displayName} • v{ext.versions[0].version}
+                          {ext.publisher.displayName} • v
+                          {ext.versions[0].version}
                         </p>
                         <p className="text-sm text-gray-600 mb-2">
                           {ext.shortDescription}
