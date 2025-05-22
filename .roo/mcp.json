@@ -3,6 +3,11 @@
     "context7": {
       "command": "npx",
       "args": ["-y", "@upstash/context7-mcp"]
+    },
+    "browsermcp": {
+      "command": "npx",
+      "args": ["@browsermcp/mcp@latest"],
+      "alwaysAllow": ["browser_navigate"]
     }
   }
 }
