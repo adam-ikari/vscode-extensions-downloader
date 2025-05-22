@@ -75,7 +75,7 @@ export default function Home() {
             </select>
           </div>
         </div>
-        {extensions.length > 0 && (
+        {extensions.length > 0 ? (
           <div className="mb-6">
             <div className="flex justify-between items-center mb-2">
               <h2 className="text-lg font-semibold">搜索结果</h2>
@@ -150,6 +150,10 @@ export default function Home() {
                 );
               })}
             </div>
+          </div>
+        ) : (
+          <div className="text-center">
+            <p className="text-gray-500">没有搜索结果</p>
           </div>
         )}
       </div>
