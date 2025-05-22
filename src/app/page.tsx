@@ -10,13 +10,14 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [os, setOs] = useState("win32");
   const [cpu, setCpu] = useState("x64");
+  const [sortBy, setSortBy] = useState("0");
 
   const { getDownloadUrl } = useDownloadUrl();
 
   const searchExtensions = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/search?query=${query}`);
+      const res = await fetch(`/api/search?query=${query}&sortBy=${sortBy}`);
       const data = (await res.json()) as { extensions?: Extension[] };
       setExtensions(data.extensions || []);
     } catch (error) {
@@ -49,7 +50,7 @@ export default function Home() {
             </button>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div>
             <label className="block text-sm font-medium mb-1">操作系统</label>
             <select
@@ -73,6 +74,22 @@ export default function Home() {
               <option value="arm64">ARM64</option>
               <option value="armhf">ARM</option>
             </select>
+          </div>
+          <div>
+            <div>
+              <label className="block text-sm font-medium mb-1">排序方式</label>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="w-full border rounded px-3 py-2"
+              >
+                <option value="0">默认排序</option>
+                <option value="4">安装量降序</option>
+                <option value="6">评分降序</option>
+                <option value="8">更新时间降序</option>
+                <option value="10">发布日期降序</option>
+              </select>
+            </div>
           </div>
         </div>
         {extensions.length > 0 ? (
