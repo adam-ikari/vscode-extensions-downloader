@@ -1,14 +1,15 @@
 export interface Extension {
-  id: string;
+  id: string; // 格式: publisher.name
   name: string;
   publisher: string;
   version: string;
   description?: string;
   icon?: string;
+  uuid: string; // 原始UUID格式ID
 }
 
 export interface DownloadRequest {
-  extensions: string[];
+  extensions: string[]; // 使用uuid格式
   version: string;
   os: string;
   cpu: string;
@@ -17,7 +18,7 @@ export interface DownloadRequest {
 export interface MarketplaceResponse {
   results: {
     extensions: {
-      extensionId: string;
+      extensionId: string; // UUID格式
       displayName: string;
       publisher: {
         displayName: string;

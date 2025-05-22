@@ -42,12 +42,15 @@ export async function GET(request: Request) {
     }
 
     const extensions: Extension[] = data.results[0].extensions.map((ext) => ({
-      id: ext.extensionId,
+      // 使用 publisher.displayName + ext.displayName 作为ID
+      id: `${ext.publisher.displayName}.${ext.displayName}`.toLowerCase().replace(/\s+/g, '-'),
       name: ext.displayName,
       publisher: ext.publisher.displayName,
       version: ext.versions[0].version,
       description: ext.shortDescription,
-      icon: ext.versions[0].files.find((f) => f.assetType === "Microsoft.VisualStudio.Services.Icons.Default")?.source
+      icon: ext.versions[0].files.find((f) => f.assetType === "Microsoft.VisualStudio.Services.Icons.Default")?.source,
+      // 保留原始UUID用于下载
+      uuid: ext.extensionId
     }));
 
     return NextResponse.json({ extensions });

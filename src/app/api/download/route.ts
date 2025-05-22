@@ -14,15 +14,8 @@ export async function POST(request: Request) {
     // 下载每个扩展并添加到ZIP
     for (const extensionId of extensions) {
       try {
-        // 正确解析publisher和name
-        const [publisher, name] = extensionId.split('.');
-        if (!publisher || !name) {
-          console.error(`Invalid extension ID format: ${extensionId}`);
-          continue;
-        }
-
-        // 构造正确的下载URL
-        const downloadUrl = `https://${publisher}.gallery.vsassets.io/_apis/public/gallery/publisher/${publisher}/extension/${name}/${version}/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage`;
+        // 使用UUID格式的ID直接构造下载URL
+        const downloadUrl = `https://marketplace.visualstudio.com/_apis/public/gallery/publishers/${extensionId.split('.')[0]}/vsextensions/${extensionId.split('.')[1]}/${version}/vspackage`;
         
         const response = await fetch(downloadUrl, {
           headers: {
