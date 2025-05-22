@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Extension } from "@/types";
+import { useDownloadUrl } from "@/hooks/useDownloadUrl";
 
 export default function Home() {
   const [query, setQuery] = useState("");
@@ -12,21 +13,7 @@ export default function Home() {
   const [os, setOs] = useState("win32");
   const [cpu, setCpu] = useState("x64");
 
-  const getDownloadUrl = (ext: Extension, os: string, cpu: string): string => {
-    // 根据操作系统和CPU架构生成下载链接
-
-    const downloadUrl = `https://marketplace.visualstudio.com/_apis/public/gallery/publishers/${ext.publisher.publisherName}/vsextensions/${ext.extensionName}/${ext.versions[0].version}/vspackage`;
-    // 判断是否有操作系统和cpu架构的版本
-    const hasPlatformVersion = ext.versions.some(
-      (version) => version.targetPlatform === `${os}-${cpu}`
-    );
-    // 如果有操作系统和cpu架构的版本，则返回带有targetPlatform参数的下载链接
-    if (hasPlatformVersion) {
-      return `${downloadUrl}?targetPlatform=${os}-${cpu}`;
-    } else {
-      return downloadUrl;
-    }
-  };
+  const { getDownloadUrl } = useDownloadUrl();
 
   // const toggleExtension = (ext: Extension) => {
   //   setSelectedExtensions((prev) =>
