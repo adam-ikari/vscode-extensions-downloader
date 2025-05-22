@@ -6,9 +6,9 @@ import { Extension } from "@/types";
 export default function Home() {
   const [query, setQuery] = useState("");
   const [extensions, setExtensions] = useState<Extension[]>([]);
-  const [selectedExtensions, setSelectedExtensions] = useState<Extension[]>([]);
+  // const [selectedExtensions, setSelectedExtensions] = useState<Extension[]>([]);
   const [loading, setLoading] = useState(false);
-  const [version, setVersion] = useState("latest");
+  // const [version, setVersion] = useState("latest");
   const [os, setOs] = useState("win32");
   const [cpu, setCpu] = useState("x64");
 
@@ -166,13 +166,7 @@ export default function Home() {
               {extensions.map((ext) => (
                 <div
                   key={ext.extensionId}
-                  className={`p-4 flex items-center justify-between ${
-                    selectedExtensions.some(
-                      (e) => e.extensionId === ext.extensionId
-                    )
-                      ? "bg-blue-100"
-                      : "bg-white"
-                  }`}
+                  className={`p-4 flex items-center justify-between`}
                 >
                   <div>
                     <h3 className="text-lg font-semibold">{ext.displayName}</h3>
