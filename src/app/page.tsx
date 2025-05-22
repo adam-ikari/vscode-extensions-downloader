@@ -170,6 +170,12 @@ export default function Home() {
                 >
                   <div>
                     <h3 className="text-lg font-semibold">{ext.displayName}</h3>
+                    <p className="text-sm text-gray-500">
+                      {ext.versions[0].version}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      {ext.publisher.displayName}
+                    </p>
                     <p className="text-sm text-gray-600">
                       {ext.shortDescription}
                     </p>
