@@ -6,39 +6,44 @@ export async function POST(request: Request) {
   try {
     const body = await request.json() as Partial<DownloadRequest>;
     
-    // 参数验证保持不变...
+    if (!body.extensions || !Array.isArray(body.extensions)) {
+      return NextResponse.json(
+        { error: "请选择要下载的插件" },
+        { status: 400 }
+      );
+    }
 
     const zip = new JSZip();
     const { extensions, version, os, cpu } = body as DownloadRequest;
 
-    // 下载每个扩展并添加到ZIP
     for (const extensionId of extensions) {
       try {
-        // 使用UUID格式的ID直接构造下载URL
-        const downloadUrl = `https://marketplace.visualstudio.com/_apis/public/gallery/publishers/${extensionId.split('.')[0]}/vsextensions/${extensionId.split('.')[1]}/${version}/vspackage`;
+        // 使用新的URL格式
+        const [publisher, name] = extensionId.split('.');
+        const downloadUrl = `https://marketplace.visualstudio.com/_apis/public/gallery/publishers/${publisher}/vsextensions/${name}/${version}/vspackage`;
         
         const response = await fetch(downloadUrl, {
           headers: {
-            'Accept': 'application/octet-stream'
+            'Accept': 'application/octet-stream',
+            'User-Agent': 'VSCode Extension Downloader'
           }
         });
         
         if (!response.ok) {
-          throw new Error(`Failed to download ${extensionId}: ${response.status}`);
+          throw new Error(`下载失败: ${response.status}`);
         }
         
         const blob = await response.blob();
-        zip.file(`${extensionId}.vsix`, blob);
-        console.log(`Successfully downloaded ${extensionId}`);
+        zip.file(`${publisher}.${name}.vsix`, blob);
       } catch (error) {
-        console.error(`Error downloading ${extensionId}:`, error);
+        console.error(`插件 ${extensionId} 下载失败:`, error);
+        continue;
       }
     }
 
-    // 生成ZIP文件
     if (Object.keys(zip.files).length === 0) {
       return NextResponse.json(
-        { error: "No extensions were successfully downloaded" },
+        { error: "没有插件下载成功" },
         { status: 400 }
       );
     }
@@ -51,9 +56,9 @@ export async function POST(request: Request) {
       },
     });
   } catch (error) {
-    console.error("Download error:", error);
+    console.error("下载出错:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "服务器内部错误" },
       { status: 500 }
     );
   }
