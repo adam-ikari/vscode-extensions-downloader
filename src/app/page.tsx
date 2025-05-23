@@ -1,63 +1,43 @@
 "use client";
 
-import { useState } from "react";
+import LoadingSpinner from "@/components/LoadingSpinner";
+import SearchInput from "@/components/SearchInput";
 import { Extension } from "@/types";
 import { useDownloadUrl } from "@/hooks/useDownloadUrl";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
+import useExtensionStore from "@/store/extensionStore";
 
 export default function Home() {
-  const [query, setQuery] = useState("");
-  const [extensions, setExtensions] = useState<Extension[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [os, setOs] = useState("win32");
-  const [cpu, setCpu] = useState("x64");
-  const [sortBy, setSortBy] = useState("0");
-  const [downloadList, setDownloadList] = useState<Extension[]>([]);
+  const {
+    query,
+    setQuery,
+    extensions,
+    loading,
+    os,
+    setOs,
+    cpu,
+    setCpu,
+    sortBy,
+    setSortBy,
+    downloadList,
+    setDownloadList,
+    searchExtensions,
+  } = useExtensionStore();
 
   const { getDownloadUrl } = useDownloadUrl();
 
-  const searchExtensions = async () => {
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/search?query=${query}&sortBy=${sortBy}`);
-      const data = (await res.json()) as { extensions?: Extension[] };
-      setExtensions(data.extensions || []);
-    } catch (error) {
-      console.error("Search失败:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <div className="min-h-screen p-8 relative">
-      {loading && (
-        <div className="loading-overlay">
-          <div className="loading-spinner"></div>
-        </div>
-      )}
+      {loading && <LoadingSpinner />}
       <div className="max-w-4xl mx-auto">
         <h1 className="text-2xl font-bold mb-6">VSCode插件下载</h1>
-        <div>
-          <label className="block text-sm font-medium mb-1">搜索插件</label>
-          <div className="flex">
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              className="flex-1 border rounded-l px-3 py-2"
-              placeholder="输入插件名称或关键词"
-            />
-            <button
-              onClick={searchExtensions}
-              disabled={loading}
-              className="bg-blue-500 text-white px-4 py-2 rounded-r hover:bg-blue-600 disabled:bg-gray-400"
-            >
-              搜索
-            </button>
-          </div>
-        </div>
+        <SearchInput
+          query={query}
+          setQuery={setQuery}
+          loading={loading}
+          onSearch={searchExtensions}
+        />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div>
             <label className="block text-sm font-medium mb-1">操作系统</label>
