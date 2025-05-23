@@ -40,19 +40,3 @@ export interface Extension {
     value: number;
   }[];
 }
-
-export interface DownloadRequest {
-  extensions: {
-    extensionName: string;
-    publisherName: string;
-    version: string;
-  }[];
-  os: string;
-  cpu: string;
-}
-
-export interface MarketplaceResponse {
-  results: {
-    extensions: Extension[];
-  }[];
-}
