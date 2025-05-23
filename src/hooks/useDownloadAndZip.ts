@@ -1,3 +1,4 @@
+import { useState } from "react";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import axios from "axios";
@@ -5,6 +6,7 @@ import { Extension } from "@/types";
 import { useDownloadUrl } from "./useDownloadUrl";
 
 export const useDownloadAndZip = () => {
+  const [isDownloading, setIsDownloading] = useState(false);
   const { getDownloadUrl } = useDownloadUrl();
 
   const downloadAndZipExtensions = async (
@@ -12,6 +14,7 @@ export const useDownloadAndZip = () => {
     os: string,
     cpu: string
   ) => {
+    setIsDownloading(true);
     const zip = new JSZip();
     const folder = zip.folder("vscode-extensions");
     
@@ -36,7 +39,8 @@ export const useDownloadAndZip = () => {
 
     const content = await zip.generateAsync({ type: "blob" });
     saveAs(content, "vscode-extensions.zip");
+    setIsDownloading(false);
   };
 
-  return { downloadAndZipExtensions };
+  return { downloadAndZipExtensions, isDownloading };
 };
