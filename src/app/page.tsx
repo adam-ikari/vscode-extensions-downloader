@@ -29,11 +29,17 @@ export default function Home() {
     searchExtensions,
   } = useExtensionStore();
 
-  const { downloadAndZipExtensions, isDownloading } = useDownloadAndZip();
+  const { downloadAndZipExtensions, abortDownload } = useDownloadAndZip();
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const handleDownload = () => {
-    if (isDownloading) return;
+    if (isDownloading) {
+      abortDownload();
+      setIsDownloading(false);
+      return;
+    }
     
+    setIsDownloading(true);
     setDownloadProgress({});
     downloadAndZipExtensions(
       downloadList,
@@ -45,7 +51,9 @@ export default function Home() {
           [extId]: progress
         }));
       }
-    );
+    ).finally(() => {
+      setIsDownloading(false);
+    });
   };
 
   return (
@@ -166,7 +174,7 @@ export default function Home() {
             <DownloadButton
               count={downloadList.length}
               onClick={handleDownload}
-              disabled={downloadList.length === 0 || isDownloading}
+              disabled={downloadList.length === 0}
               className="w-full"
               isDownloading={isDownloading}
             />

@@ -1,13 +1,12 @@
-import { useState, useRef } from "react";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import axios from "axios";
 import { Extension } from "@/types";
 
 export const useDownloadAndZip = () => {
-  const [isDownloading, setIsDownloading] = useState(false);
-  const [animationProgress, setAnimationProgress] = useState(0);
-  const animationRef = useRef<NodeJS.Timeout | null>(null);
+  let cancelTokenSource = axios.CancelToken.source();
+  let isDownloading = false;
+  let currentRequest: Promise<any> | null = null;
 
   const getDownloadUrl = (ext: Extension, os: string, cpu: string): string => {
     const downloadUrl = `https://marketplace.visualstudio.com/_apis/public/gallery/publishers/${ext.publisher.publisherName}/vsextensions/${ext.extensionName}/${ext.versions[0].version}/vspackage`;
@@ -21,6 +20,14 @@ export const useDownloadAndZip = () => {
     }
   };
 
+  const abortDownload = () => {
+    if (isDownloading) {
+      cancelTokenSource.cancel("Download cancelled by user");
+      isDownloading = false;
+      currentRequest = null;
+    }
+  };
+
   const downloadAndZipExtensions = async (
     extensions: Extension[],
     os: string,
@@ -28,47 +35,27 @@ export const useDownloadAndZip = () => {
     onProgress?: (extId: string, progress: number) => void
   ) => {
     try {
-      setIsDownloading(true);
+      cancelTokenSource = axios.CancelToken.source();
+      isDownloading = true;
+      currentRequest = null;
       const zip = new JSZip();
       const folder = zip.folder("vscode-extensions");
 
       for (const ext of extensions) {
         const url = getDownloadUrl(ext, os, cpu);
-        console.log('Starting download for:', ext.extensionName);
-        const response = await axios.get(url, {
+        currentRequest = axios.get(url, {
           responseType: "arraybuffer",
+          cancelToken: cancelTokenSource.token,
           onDownloadProgress: (progressEvent) => {
-            console.log("onDownloadProgress:", progressEvent);
             if (progressEvent.total) {
               const progress = Math.round(
                 (progressEvent.loaded / progressEvent.total) * 100
               );
-              console.log(`Progress update for ${ext.extensionName}: ${progress}%`);
-              // 使用requestAnimationFrame确保UI及时更新
-              requestAnimationFrame(() => {
-                onProgress?.(ext.extensionId, progress);
-              });
-              // 清除动画定时器
-              if (animationRef.current) {
-                clearInterval(animationRef.current);
-                animationRef.current = null;
-              }
-            } else {
-              // 当total不可用时，启动循环进度条动画
-              if (!animationRef.current) {
-                animationRef.current = setInterval(() => {
-                  setAnimationProgress(prev => {
-                    const newProgress = (prev + 5) % 100;
-                    requestAnimationFrame(() => {
-                      onProgress?.(ext.extensionId, newProgress);
-                    });
-                    return newProgress;
-                  });
-                }, 200);
-              }
+              onProgress?.(ext.extensionId, progress);
             }
           },
         });
+        const response = await currentRequest;
 
         const blob = new Blob([response.data]);
         const fileName = `${ext.publisher.publisherName}.${ext.extensionName}-${ext.versions[0].version}.vsix`;
@@ -82,24 +69,16 @@ export const useDownloadAndZip = () => {
       saveAs(content, "vscode-extensions.zip");
       onProgress?.("all", 100);
     } catch (err) {
-      if (err instanceof Error) {
-        console.error("Download error:", err.message);
-      } else {
-        console.error("Unknown error occurred during download");
+      if (axios.isCancel(err)) {
+        console.log("Download cancelled:", err.message);
+      } else if (err instanceof Error) {
+        console.error("Download error:", err);
       }
     } finally {
-      setIsDownloading(false);
-      // 设置最终进度为100%
-      requestAnimationFrame(() => {
-        onProgress?.("all", 100);
-      });
-      // 清除动画定时器
-      if (animationRef.current) {
-        clearInterval(animationRef.current);
-        animationRef.current = null;
-      }
+      isDownloading = false;
+      currentRequest = null;
     }
   };
 
-  return { downloadAndZipExtensions, isDownloading };
+  return { downloadAndZipExtensions, abortDownload };
 };
