@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import SearchInput from "@/components/SearchInput";
 import DownloadButton from "@/components/DownloadButton";
@@ -11,8 +10,6 @@ import { useDownloadAndZip } from "@/hooks/useDownloadAndZip";
 import useExtensionStore from "@/store/extensionStore";
 
 export default function Home() {
-  const [downloadProgress, setDownloadProgress] = useState<Record<string, number>>({});
-  
   const {
     query,
     setQuery,
@@ -29,32 +26,7 @@ export default function Home() {
     searchExtensions,
   } = useExtensionStore();
 
-  const { downloadAndZipExtensions, abortDownload } = useDownloadAndZip();
-  const [isDownloading, setIsDownloading] = useState(false);
-
-  const handleDownload = () => {
-    if (isDownloading) {
-      abortDownload();
-      setIsDownloading(false);
-      return;
-    }
-    
-    setIsDownloading(true);
-    setDownloadProgress({});
-    downloadAndZipExtensions(
-      downloadList,
-      os,
-      cpu,
-      (extId, progress) => {
-        setDownloadProgress(prev => ({
-          ...prev,
-          [extId]: progress
-        }));
-      }
-    ).finally(() => {
-      setIsDownloading(false);
-    });
-  };
+  const { downloadAndZipExtensions } = useDownloadAndZip();
 
   return (
     <div className="min-h-screen p-8 relative">
@@ -132,51 +104,35 @@ export default function Home() {
               </button>
             </div>
             <ul className="mb-4 max-h-60 overflow-y-auto divide-y divide-gray-100">
-              {downloadList.map((ext) => {
-                const progress = downloadProgress[ext.extensionId];
-                return (
-                  <li
-                    key={ext.extensionId}
-                    className="py-2 px-1 hover:bg-gray-50 transition-colors"
+              {downloadList.map((ext) => (
+                <li
+                  key={ext.extensionId}
+                  className="flex justify-between items-center py-2 px-1 hover:bg-gray-50 transition-colors"
+                >
+                  <span className="text-sm text-gray-700 truncate max-w-[160px]">
+                    {ext.displayName}
+                  </span>
+                  <button
+                    onClick={() =>
+                      setDownloadList(
+                        downloadList.filter(
+                          (item) => item.extensionId !== ext.extensionId
+                        )
+                      )
+                    }
+                    className="text-red-400 hover:text-red-600 text-xs p-1 rounded-full hover:bg-red-50 transition-colors"
+                    title="移除"
                   >
-                    <div className="flex flex-col gap-1">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-700 truncate max-w-[160px]">
-                          {ext.displayName}
-                        </span>
-                        <button
-                          onClick={() =>
-                            setDownloadList(
-                              downloadList.filter(
-                                (item) => item.extensionId !== ext.extensionId
-                              )
-                            )
-                          }
-                          className="text-red-400 hover:text-red-600 text-xs p-1 rounded-full hover:bg-red-50 transition-colors"
-                          title="移除"
-                        >
-                          ×
-                        </button>
-                      </div>
-                      {progress !== undefined && (
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div
-                            className="bg-blue-500 h-2 rounded-full"
-                            style={{ width: `${progress}%` }}
-                          ></div>
-                        </div>
-                      )}
-                    </div>
-                  </li>
-                );
-              })}
+                    ×
+                  </button>
+                </li>
+              ))}
             </ul>
             <DownloadButton
               count={downloadList.length}
-              onClick={handleDownload}
+              onClick={() => downloadAndZipExtensions(downloadList, os, cpu)}
               disabled={downloadList.length === 0}
               className="w-full"
-              isDownloading={isDownloading}
             />
           </div>
         )}

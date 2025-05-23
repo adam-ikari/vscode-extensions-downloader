@@ -1,5 +1,4 @@
 import { Extension } from "@/types";
-import { useState } from "react";
 
 interface SearchResultsProps {
   extensions: Extension[];
@@ -65,24 +64,22 @@ export default function SearchResults({
               </span>
             </div>
           </div>
-          <div className="flex flex-col items-end gap-2">
-            <button
-              onClick={() => {
-                if (isSelected) {
-                  onDeselect(ext);
-                } else {
-                  onSelect(ext);
-                }
-              }}
-              className={`px-3 py-1 rounded text-sm whitespace-nowrap ${
-                isSelected
-                  ? "bg-green-500 hover:bg-green-600 text-white"
-                  : "bg-blue-500 hover:bg-blue-600 text-white"
-              }`}
-            >
-              {isSelected ? "已选择" : "选择"}
-            </button>
-          </div>
+          <button
+            onClick={() => {
+              if (isSelected) {
+                onDeselect(ext);
+              } else {
+                onSelect(ext);
+              }
+            }}
+            className={`px-3 py-1 rounded text-sm whitespace-nowrap ${
+              isSelected
+                ? "bg-green-500 hover:bg-green-600 text-white"
+                : "bg-blue-500 hover:bg-blue-600 text-white"
+            }`}
+          >
+            {isSelected ? "已选择" : "选择"}
+          </button>
         </div>
       </div>
     );
