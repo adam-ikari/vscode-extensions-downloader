@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { Extension } from "@/types";
 import { useDownloadUrl } from "@/hooks/useDownloadUrl";
+import JSZip from "jszip";
+import { saveAs } from "file-saver";
 
 export default function Home() {
   const [query, setQuery] = useState("");
@@ -11,6 +13,7 @@ export default function Home() {
   const [os, setOs] = useState("win32");
   const [cpu, setCpu] = useState("x64");
   const [sortBy, setSortBy] = useState("0");
+  const [downloadList, setDownloadList] = useState<Extension[]>([]);
 
   const { getDownloadUrl } = useDownloadUrl();
 
@@ -161,12 +164,22 @@ export default function Home() {
                           </span>
                         </div>
                       </div>
-                      <a
-                        href={getDownloadUrl(ext, os, cpu)}
-                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm whitespace-nowrap"
+                      <button
+                        onClick={() => {
+                          if (downloadList.some(item => item.extensionId === ext.extensionId)) {
+                            setDownloadList(downloadList.filter(item => item.extensionId !== ext.extensionId));
+                          } else {
+                            setDownloadList([...downloadList, ext]);
+                          }
+                        }}
+                        className={`px-3 py-1 rounded text-sm whitespace-nowrap ${
+                          downloadList.some(item => item.extensionId === ext.extensionId)
+                            ? "bg-green-500 hover:bg-green-600 text-white"
+                            : "bg-blue-500 hover:bg-blue-600 text-white"
+                        }`}
                       >
-                        下载
-                      </a>
+                        {downloadList.some(item => item.extensionId === ext.extensionId) ? "已添加" : "加入列表"}
+                      </button>
                     </div>
                   </div>
                 );
@@ -176,6 +189,45 @@ export default function Home() {
         ) : (
           <div className="text-center">
             <p className="text-gray-500">没有搜索结果</p>
+          </div>
+        )}
+
+        {downloadList.length > 0 && (
+          <div className="fixed bottom-4 right-4 bg-white p-4 rounded-lg shadow-lg border">
+            <h3 className="font-bold mb-2">下载列表 ({downloadList.length})</h3>
+            <ul className="mb-4 max-h-60 overflow-y-auto">
+              {downloadList.map(ext => (
+                <li key={ext.extensionId} className="flex justify-between items-center py-1">
+                  <span className="text-sm">{ext.displayName}</span>
+                  <button
+                    onClick={() => setDownloadList(downloadList.filter(item => item.extensionId !== ext.extensionId))}
+                    className="text-red-500 text-xs"
+                  >
+                    移除
+                  </button>
+                </li>
+              ))}
+            </ul>
+            <button
+              onClick={async () => {
+                const zip = new JSZip();
+                const folder = zip.folder("vscode-extensions");
+                
+                for (const ext of downloadList) {
+                  const url = getDownloadUrl(ext, os, cpu);
+                  const response = await fetch(url);
+                  const blob = await response.blob();
+                  const fileName = `${ext.publisher.publisherName}.${ext.extensionName}-${ext.versions[0].version}.vsix`;
+                  folder?.file(fileName, blob);
+                }
+
+                const content = await zip.generateAsync({ type: "blob" });
+                saveAs(content, "vscode-extensions.zip");
+              }}
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded"
+            >
+              批量下载 ({downloadList.length})
+            </button>
           </div>
         )}
       </div>
