@@ -2,6 +2,7 @@
 
 import LoadingSpinner from "@/components/LoadingSpinner";
 import SearchInput from "@/components/SearchInput";
+import DownloadButton from "@/components/DownloadButton";
 import { Extension } from "@/types";
 import { useDownloadUrl } from "@/hooks/useDownloadUrl";
 import JSZip from "jszip";
@@ -200,7 +201,8 @@ export default function Home() {
                 </li>
               ))}
             </ul>
-            <button
+            <DownloadButton
+              count={downloadList.length}
               onClick={async () => {
                 const zip = new JSZip();
                 const folder = zip.folder("vscode-extensions");
@@ -216,14 +218,9 @@ export default function Home() {
                 const content = await zip.generateAsync({ type: "blob" });
                 saveAs(content, "vscode-extensions.zip");
               }}
-              className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded transition-colors flex items-center justify-center gap-2"
               disabled={downloadList.length === 0}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-              </svg>
-              批量下载 ({downloadList.length})
-            </button>
+              className="w-full"
+            />
           </div>
         )}
       </div>

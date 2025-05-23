@@ -1,4 +1,6 @@
 import React from 'react';
+import SearchButton from './SearchButton';
+import SearchField from './SearchField';
 
 interface SearchInputProps {
   query: string;
@@ -21,20 +23,15 @@ const SearchInput: React.FC<SearchInputProps> = ({
     <div className={`${className}`}>
       <label className="block text-sm font-medium mb-1">搜索插件</label>
       <div className="flex">
-        <input
-          type="text"
+        <SearchField
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="flex-1 border rounded-l px-3 py-2"
+          onChange={setQuery}
           placeholder={placeholder}
         />
-        <button
+        <SearchButton
           onClick={onSearch}
-          disabled={loading}
-          className="bg-blue-500 text-white px-4 py-2 rounded-r hover:bg-blue-600 disabled:bg-gray-400"
-        >
-          搜索
-        </button>
+          loading={loading}
+        />
       </div>
     </div>
   );
