@@ -4,7 +4,7 @@ interface SearchResultsProps {
   extensions: Extension[];
   selectedIds: string[];
   onSelect: (ext: Extension) => void;
-  onDeselect: (extId: string) => void;
+  onDeselect: (ext: Extension) => void;
   renderItem?: (ext: Extension, isSelected: boolean) => React.ReactNode;
 }
 
@@ -66,7 +66,11 @@ export default function SearchResults({
           </div>
           <button
             onClick={() => {
-              isSelected ? onDeselect(ext.extensionId) : onSelect(ext);
+              if (isSelected) {
+                onDeselect(ext);
+              } else {
+                onSelect(ext);
+              }
             }}
             className={`px-3 py-1 rounded text-sm whitespace-nowrap ${
               isSelected

@@ -78,9 +78,9 @@ export default function Home() {
             extensions={extensions}
             selectedIds={downloadList.map((item) => item.extensionId)}
             onSelect={(ext: Extension) => setDownloadList([...downloadList, ext])}
-            onDeselect={(extId: string) =>
+            onDeselect={(ext: Extension) =>
               setDownloadList(
-                downloadList.filter((item) => item.extensionId !== extId)
+                downloadList.filter((item) => item.extensionId !== ext.extensionId)
               )
             }
           />

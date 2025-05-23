@@ -4,7 +4,6 @@ import { Extension, MarketplaceResponse } from "@/types";
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const query = searchParams.get("query");
-  const sortBy = searchParams.get("sortBy") || "0";
 
   if (!query) {
     return NextResponse.json(
@@ -31,7 +30,7 @@ export async function GET(request: Request) {
             ],
             pageNumber: 1,
             pageSize: 50,
-            sortBy: parseInt(sortBy),
+            sortBy: 0,
           },
         ],
         flags: 914,

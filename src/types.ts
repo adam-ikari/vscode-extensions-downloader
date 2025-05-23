@@ -40,3 +40,9 @@ export interface Extension {
     value: number;
   }[];
 }
+
+export interface MarketplaceResponse {
+  results: {
+    extensions: Extension[];
+  }[];
+}
