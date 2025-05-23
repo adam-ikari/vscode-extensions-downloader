@@ -193,17 +193,29 @@ export default function Home() {
         )}
 
         {downloadList.length > 0 && (
-          <div className="fixed bottom-4 right-4 bg-white p-4 rounded-lg shadow-lg border">
-            <h3 className="font-bold mb-2">下载列表 ({downloadList.length})</h3>
-            <ul className="mb-4 max-h-60 overflow-y-auto">
+          <div className="fixed bottom-4 right-4 bg-white p-4 rounded-lg shadow-xl border border-gray-200 w-64 transition-all duration-300 transform hover:scale-105">
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="font-bold text-gray-800">下载列表 ({downloadList.length})</h3>
+              <button
+                onClick={() => setDownloadList([])}
+                className="text-xs text-gray-500 hover:text-red-500"
+              >
+                清空
+              </button>
+            </div>
+            <ul className="mb-4 max-h-60 overflow-y-auto divide-y divide-gray-100">
               {downloadList.map(ext => (
-                <li key={ext.extensionId} className="flex justify-between items-center py-1">
-                  <span className="text-sm">{ext.displayName}</span>
+                <li
+                  key={ext.extensionId}
+                  className="flex justify-between items-center py-2 px-1 hover:bg-gray-50 transition-colors"
+                >
+                  <span className="text-sm text-gray-700 truncate max-w-[160px]">{ext.displayName}</span>
                   <button
                     onClick={() => setDownloadList(downloadList.filter(item => item.extensionId !== ext.extensionId))}
-                    className="text-red-500 text-xs"
+                    className="text-red-400 hover:text-red-600 text-xs p-1 rounded-full hover:bg-red-50 transition-colors"
+                    title="移除"
                   >
-                    移除
+                    ×
                   </button>
                 </li>
               ))}
@@ -224,8 +236,12 @@ export default function Home() {
                 const content = await zip.generateAsync({ type: "blob" });
                 saveAs(content, "vscode-extensions.zip");
               }}
-              className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded"
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded transition-colors flex items-center justify-center gap-2"
+              disabled={downloadList.length === 0}
             >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
               批量下载 ({downloadList.length})
             </button>
           </div>
