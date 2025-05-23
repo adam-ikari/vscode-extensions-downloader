@@ -5,8 +5,7 @@ import SearchInput from "@/components/SearchInput";
 import DownloadButton from "@/components/DownloadButton";
 import { Extension } from "@/types";
 import { useDownloadUrl } from "@/hooks/useDownloadUrl";
-import JSZip from "jszip";
-import { saveAs } from "file-saver";
+import { useDownloadAndZip } from "@/hooks/useDownloadAndZip";
 import useExtensionStore from "@/store/extensionStore";
 
 export default function Home() {
@@ -27,6 +26,7 @@ export default function Home() {
   } = useExtensionStore();
 
   const { getDownloadUrl } = useDownloadUrl();
+  const { downloadAndZipExtensions } = useDownloadAndZip();
 
   return (
     <div className="min-h-screen p-8 relative">
@@ -203,21 +203,7 @@ export default function Home() {
             </ul>
             <DownloadButton
               count={downloadList.length}
-              onClick={async () => {
-                const zip = new JSZip();
-                const folder = zip.folder("vscode-extensions");
-                
-                for (const ext of downloadList) {
-                  const url = getDownloadUrl(ext, os, cpu);
-                  const response = await fetch(url);
-                  const blob = await response.blob();
-                  const fileName = `${ext.publisher.publisherName}.${ext.extensionName}-${ext.versions[0].version}.vsix`;
-                  folder?.file(fileName, blob);
-                }
-
-                const content = await zip.generateAsync({ type: "blob" });
-                saveAs(content, "vscode-extensions.zip");
-              }}
+              onClick={() => downloadAndZipExtensions(downloadList, os, cpu)}
               disabled={downloadList.length === 0}
               className="w-full"
             />
