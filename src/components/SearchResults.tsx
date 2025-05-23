@@ -1,13 +1,10 @@
 import { Extension } from "@/types";
-import { useState } from "react";
 
 interface SearchResultsProps {
   extensions: Extension[];
   selectedIds: string[];
   onSelect: (ext: Extension) => void;
   onDeselect: (extId: string) => void;
-  onSelectAll?: () => void;
-  onDeselectAll?: () => void;
   renderItem?: (ext: Extension, isSelected: boolean) => React.ReactNode;
 }
 
@@ -16,15 +13,14 @@ export default function SearchResults({
   selectedIds,
   onSelect,
   onDeselect,
-  onSelectAll,
-  onDeselectAll,
   renderItem,
 }: SearchResultsProps) {
   const defaultRenderItem = (ext: Extension, isSelected: boolean) => {
-    const stats = ext.statistics?.reduce((acc, stat) => {
-      acc[stat.statisticName] = stat.value;
-      return acc;
-    }, {} as Record<string, number>) || {};
+    const stats =
+      ext.statistics?.reduce((acc, stat) => {
+        acc[stat.statisticName] = stat.value;
+        return acc;
+      }, {} as Record<string, number>) || {};
 
     const installs = stats.install || 0;
     const rating = stats.averagerating || 0;
@@ -52,9 +48,7 @@ export default function SearchResults({
             <p className="text-sm text-gray-500 mb-1">
               {ext.publisher.displayName} • v{ext.versions[0].version}
             </p>
-            <p className="text-sm text-gray-600 mb-2">
-              {ext.shortDescription}
-            </p>
+            <p className="text-sm text-gray-600 mb-2">{ext.shortDescription}</p>
             <div className="flex flex-wrap gap-2 mb-2">
               <span className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded">
                 安装量: {Math.floor(installs / 1000)}k+
@@ -90,7 +84,9 @@ export default function SearchResults({
   return (
     <div className="mb-6">
       <div className="flex justify-between items-center mb-2">
-        <h2 className="text-lg font-semibold">搜索结果 ({extensions.length})</h2>
+        <h2 className="text-lg font-semibold">
+          搜索结果 ({extensions.length})
+        </h2>
       </div>
       <div className="border rounded divide-y">
         {extensions.map((ext) => {
