@@ -19,18 +19,14 @@ const DownloadButton: React.FC<DownloadButtonProps> = ({
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`${isDownloading ? 'bg-red-500 hover:bg-red-600' : 'bg-blue-500 hover:bg-blue-600'} text-white py-2 rounded transition-colors flex items-center justify-center gap-2 ${className}`}
+      className={`${isDownloading ? 'bg-gray-500 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600'} text-white py-2 rounded transition-colors flex items-center justify-center gap-2 ${className}`}
     >
-      {isDownloading ? (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      ) : (
+      {!isDownloading && (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
         </svg>
       )}
-      {isDownloading ? `停止下载 (${count})` : `批量下载 (${count})`}
+      {isDownloading ? `下载中 (${count})` : `批量下载 (${count})`}
     </button>
   );
 };
