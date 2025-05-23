@@ -26,7 +26,7 @@ export default function Home() {
     searchExtensions,
   } = useExtensionStore();
 
-  const { downloadAndZipExtensions } = useDownloadAndZip();
+  const { downloadAndZipExtensions, isDownloading } = useDownloadAndZip();
 
   return (
     <div className="min-h-screen p-8 relative">
@@ -131,7 +131,8 @@ export default function Home() {
             <DownloadButton
               count={downloadList.length}
               onClick={() => downloadAndZipExtensions(downloadList, os, cpu)}
-              disabled={downloadList.length === 0}
+              disabled={downloadList.length === 0 || isDownloading}
+              loading={isDownloading}
               className="w-full"
             />
           </div>
