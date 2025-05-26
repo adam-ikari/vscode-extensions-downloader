@@ -8,10 +8,8 @@ interface ExtensionStore {
   setExtensions: (extensions: Extension[]) => void;
   loading: boolean;
   setLoading: (loading: boolean) => void;
-  os: string;
-  setOs: (os: string) => void;
-  cpu: string;
-  setCpu: (cpu: string) => void;
+  platforms: string[];
+  setPlatforms: (platforms: string[]) => void;
   sortBy: string;
   setSortBy: (sortBy: string) => void;
   downloadList: Extension[];
@@ -26,10 +24,10 @@ const useExtensionStore = create<ExtensionStore>((set) => ({
   setExtensions: (extensions) => set({ extensions }),
   loading: false,
   setLoading: (loading) => set({ loading }),
-  os: 'win32',
-  setOs: (os) => set({ os }),
-  cpu: 'x64',
-  setCpu: (cpu) => set({ cpu }),
+  platforms: ['win32-x64'],
+  setPlatforms: (platforms) => set({
+    platforms: Array.isArray(platforms) ? platforms : [platforms]
+  }),
   sortBy: '0',
   setSortBy: (sortBy) => set({ sortBy }),
   downloadList: [],
