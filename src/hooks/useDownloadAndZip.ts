@@ -11,21 +11,22 @@ export const useDownloadAndZip = () => {
 
   const downloadAndZipExtensions = async (
     extensions: Extension[],
-    os: string,
-    cpu: string
+    platforms: string[]
   ) => {
     setIsDownloading(true);
     const zip = new JSZip();
     const folder = zip.folder("vscode-extensions");
     
     for (const ext of extensions) {
-      const url = getDownloadUrl(ext, os, cpu);
-      const response = await axios.get(url, {
-        responseType: "blob"
-      });
-      
-      // 从Content-Disposition获取文件名
-      let fileName = `${ext.publisher.publisherName}.${ext.extensionName}-${ext.versions[0].version}.vsix`;
+      for (const platform of platforms) {
+        const [os, cpu] = platform.split('-');
+        const url = getDownloadUrl(ext, os, cpu);
+        const response = await axios.get(url, {
+          responseType: "blob"
+        });
+        
+        // 从Content-Disposition获取文件名并添加平台信息
+        let fileName = `${ext.publisher.publisherName}.${ext.extensionName}_${ext.versions[0].version}_${platform}.vsix`;
       const contentDisposition = response.headers["content-disposition"];
       if (contentDisposition) {
         const match = contentDisposition.match(/filename="?(.+?)"?$/);
@@ -35,6 +36,7 @@ export const useDownloadAndZip = () => {
       }
       
       folder?.file(fileName, response.data);
+      }
     }
 
     const content = await zip.generateAsync({ type: "blob" });

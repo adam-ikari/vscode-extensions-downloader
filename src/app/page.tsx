@@ -3,8 +3,9 @@
 import LoadingSpinner from "@/components/LoadingSpinner";
 import SearchInput from "@/components/SearchInput";
 import DownloadButton from "@/components/DownloadButton";
-import Dropdown from "@/components/Dropdown";
+import MultiSelect from "@/components/MultiSelect";
 import SearchResults from "@/components/SearchResults";
+import Dropdown from "@/components/Dropdown";
 import { Extension } from "@/types";
 import { useDownloadAndZip } from "@/hooks/useDownloadAndZip";
 import useExtensionStore from "@/store/extensionStore";
@@ -15,10 +16,8 @@ export default function Home() {
     setQuery,
     extensions,
     loading,
-    os,
-    setOs,
-    cpu,
-    setCpu,
+    platforms,
+    setPlatforms,
     sortBy,
     setSortBy,
     downloadList,
@@ -39,27 +38,21 @@ export default function Home() {
           loading={loading}
           onSearch={searchExtensions}
         />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <Dropdown
-            label="操作系统"
-            value={os}
-            onChange={setOs}
-            options={[
-              { value: "win32", label: "Windows" },
-              { value: "darwin", label: "macOS" },
-              { value: "linux", label: "Linux" },
-            ]}
-          />
-          <Dropdown
-            label="CPU架构"
-            value={cpu}
-            onChange={setCpu}
-            options={[
-              { value: "x64", label: "x64" },
-              { value: "arm64", label: "ARM64" },
-              { value: "armhf", label: "ARM" },
-            ]}
-          />
+
+        <MultiSelect
+          label="平台"
+          values={platforms}
+          onChange={setPlatforms}
+          options={[
+            { value: "win32-x64", label: "Windows x64" },
+            { value: "win32-arm64", label: "Windows ARM64" },
+            { value: "darwin-x64", label: "macOS x64" },
+            { value: "darwin-arm64", label: "macOS ARM64" },
+            { value: "linux-x64", label: "Linux x64" },
+            { value: "linux-arm64", label: "Linux ARM64" },
+          ]}
+        />
+        <div className="flex flex-wrap gap-4 mb-6">
           <Dropdown
             label="排序方式"
             value={sortBy}
@@ -77,10 +70,14 @@ export default function Home() {
           <SearchResults
             extensions={extensions}
             selectedIds={downloadList.map((item) => item.extensionId)}
-            onSelect={(ext: Extension) => setDownloadList([...downloadList, ext])}
+            onSelect={(ext: Extension) =>
+              setDownloadList([...downloadList, ext])
+            }
             onDeselect={(ext: Extension) =>
               setDownloadList(
-                downloadList.filter((item) => item.extensionId !== ext.extensionId)
+                downloadList.filter(
+                  (item) => item.extensionId !== ext.extensionId
+                )
               )
             }
           />
@@ -130,7 +127,7 @@ export default function Home() {
             </ul>
             <DownloadButton
               count={downloadList.length}
-              onClick={() => downloadAndZipExtensions(downloadList, os, cpu)}
+              onClick={() => downloadAndZipExtensions(downloadList, platforms)}
               disabled={downloadList.length === 0 || isDownloading}
               loading={isDownloading}
               className="w-full"
