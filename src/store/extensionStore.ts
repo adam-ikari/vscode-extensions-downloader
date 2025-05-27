@@ -12,8 +12,6 @@ interface ExtensionStore {
   setPlatforms: (platforms: string[]) => void;
   sortBy: string;
   setSortBy: (sortBy: string) => void;
-  downloadList: Extension[];
-  setDownloadList: (downloadList: Extension[]) => void;
   searchExtensions: () => Promise<void>;
 }
 
@@ -30,8 +28,6 @@ const useExtensionStore = create<ExtensionStore>((set) => ({
   }),
   sortBy: '0',
   setSortBy: (sortBy) => set({ sortBy }),
-  downloadList: [],
-  setDownloadList: (downloadList) => set({ downloadList }),
   searchExtensions: async () => {
     const { query, sortBy } = useExtensionStore.getState();
     set({ loading: true });
