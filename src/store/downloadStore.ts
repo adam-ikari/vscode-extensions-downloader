@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { Extension } from '@/types';
 
 interface DownloadStore {
@@ -14,17 +15,27 @@ interface DownloadStore {
   setCompletedFiles: (completedFiles: number) => void;
 }
 
-const useDownloadStore = create<DownloadStore>((set) => ({
-  downloadList: [],
-  setDownloadList: (downloadList) => set({ downloadList }),
-  isDownloading: false,
-  setIsDownloading: (isDownloading) => set({ isDownloading }),
-  progress: 0,
-  setProgress: (progress) => set({ progress }),
-  totalFiles: 0,
-  setTotalFiles: (totalFiles) => set({ totalFiles }),
-  completedFiles: 0,
-  setCompletedFiles: (completedFiles) => set({ completedFiles }),
-}));
+const STORAGE_KEY = 'vscode-extensions-downloader';
+
+const useDownloadStore = create<DownloadStore>()(
+  persist(
+    (set) => ({
+      downloadList: [],
+      setDownloadList: (downloadList) => set({ downloadList }),
+      isDownloading: false,
+      setIsDownloading: (isDownloading) => set({ isDownloading }),
+      progress: 0,
+      setProgress: (progress) => set({ progress }),
+      totalFiles: 0,
+      setTotalFiles: (totalFiles) => set({ totalFiles }),
+      completedFiles: 0,
+      setCompletedFiles: (completedFiles) => set({ completedFiles }),
+    }),
+    {
+      name: STORAGE_KEY,
+      partialize: (state) => ({ downloadList: state.downloadList }),
+    }
+  )
+);
 
 export default useDownloadStore;
