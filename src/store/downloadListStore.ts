@@ -1,17 +1,11 @@
 import { create } from 'zustand';
-
-export interface DownloadableExtension {
-  extensionId: string;
-  publisherName: string;
-  extensionName: string;
-  version: string;
-}
+import { Extension } from '@/types';
 
 interface DownloadListStore {
-  extensions: DownloadableExtension[];
-  setExtensions: (extensions: DownloadableExtension[]) => void;
-  selectedExtensions: DownloadableExtension[];
-  setSelectedExtensions: (selectedExtensions: DownloadableExtension[]) => void;
+  extensions: Extension[];
+  setExtensions: (extensions: Extension[]) => void;
+  selectedExtensions: Extension[];
+  setSelectedExtensions: (selectedExtensions: Extension[]) => void;
 }
 
 const useDownloadList = create<DownloadListStore>()((set) => ({
