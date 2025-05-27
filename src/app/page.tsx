@@ -9,13 +9,13 @@ import Dropdown from "@/components/Dropdown";
 import { Extension } from "@/types";
 import { useDownloadAndZip } from "@/hooks/useDownloadAndZip";
 import useExtensionStore from "@/store/extensionStore";
+import useDownloadListStore from "@/store/downloadListStore";
 import useDownloadStore from "@/store/downloadStore";
 
 export default function Home() {
   const {
     query,
     setQuery,
-    extensions,
     loading,
     platforms,
     setPlatforms,
@@ -25,6 +25,7 @@ export default function Home() {
   } = useExtensionStore();
 
   const { downloadList, setDownloadList } = useDownloadStore();
+  const { extensions = [] } = useDownloadListStore();
 
   const { downloadAndZipExtensions, isDownloading } = useDownloadAndZip();
 

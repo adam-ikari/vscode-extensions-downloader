@@ -1,11 +1,10 @@
 import { create } from 'zustand';
 import { Extension } from '@/types';
+import useExtensionListStore from './downloadListStore';
 
 interface ExtensionStore {
   query: string;
   setQuery: (query: string) => void;
-  extensions: Extension[];
-  setExtensions: (extensions: Extension[]) => void;
   loading: boolean;
   setLoading: (loading: boolean) => void;
   platforms: string[];
@@ -18,8 +17,6 @@ interface ExtensionStore {
 const useExtensionStore = create<ExtensionStore>((set) => ({
   query: '',
   setQuery: (query) => set({ query }),
-  extensions: [],
-  setExtensions: (extensions) => set({ extensions }),
   loading: false,
   setLoading: (loading) => set({ loading }),
   platforms: ['win32-x64'],
@@ -34,7 +31,7 @@ const useExtensionStore = create<ExtensionStore>((set) => ({
     try {
       const res = await fetch(`/api/search?query=${query}&sortBy=${sortBy}`);
       const data = (await res.json()) as { extensions?: Extension[] };
-      set({ extensions: data.extensions || [] });
+      useExtensionListStore.getState().setExtensions(data.extensions || []);
     } catch (error) {
       console.error('Search失败:', error);
     } finally {
